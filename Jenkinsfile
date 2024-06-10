@@ -6,10 +6,17 @@ pipeline {
     }
 
     stages {
-        stage('Clone Repository') {
+        stage('Checkout Main') {
             steps {
-                // Checkout the repository containing the Python script
-                git 'https://github.com/nirakh123/netmiko-script' // Replace with your repository URL
+                // Checkout the main branch to get the Jenkinsfile
+                checkout([$class: 'GitSCM', branches: [[name: 'refs/heads/main']], userRemoteConfigs: [[url: 'https://github.com/nirakh123/netmiko-script.git']]])
+            }
+        }
+        
+        stage('Checkout Master') {
+            steps {
+                // Checkout the master branch to get the Python script
+                checkout([$class: 'GitSCM', branches: [[name: 'refs/heads/master']], userRemoteConfigs: [[url: 'https://github.com/nirakh123/netmiko-script.git']]])
             }
         }
 
