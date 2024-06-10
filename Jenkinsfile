@@ -1,5 +1,10 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'python:3.8-slim' // Use a suitable Python Docker image
+            args '-u root' // Run as root user inside the container
+        }
+    }
 
     environment {
         DEVICE_IP = '10.235.3.50' // Replace this with the actual IP of your Cisco device
@@ -22,18 +27,6 @@ pipeline {
 
         stage('Setup Python Environment') {
             steps {
-                // Ensure Python is installed
-                sh '''
-                if ! command -v python &> /dev/null
-                then
-                    echo "Python not found. Installing Python..."
-                    apt-get update
-                    apt-get install -y python3
-                    ln -s /usr/bin/python3 /usr/bin/python
-                else
-                    echo "Python is already installed."
-                fi
-                '''
                 // Install dependencies
                 sh 'pip install netmiko'
             }
