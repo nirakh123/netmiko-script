@@ -22,6 +22,18 @@ pipeline {
 
         stage('Setup Python Environment') {
             steps {
+                // Ensure Python is installed
+                sh '''
+                if ! command -v python &> /dev/null
+                then
+                    echo "Python not found. Installing Python..."
+                    apt-get update
+                    apt-get install -y python3
+                    ln -s /usr/bin/python3 /usr/bin/python
+                else
+                    echo "Python is already installed."
+                fi
+                '''
                 // Install dependencies
                 sh 'pip install netmiko'
             }
@@ -31,10 +43,15 @@ pipeline {
             steps {
                 // Use withCredentials to inject the username and password
                 withCredentials([usernamePassword(credentialsId: 'CISCO_SWITCH_CREDENTIALS', passwordVariable: 'DEVICE_PASSWORD', usernameVariable: 'DEVICE_USERNAME')]) {
-                    // Execute the Python script with the environment variables
-                    sh """
-                    python retrieve_config.py ${DEVICE_IP} ${DEVICE_USERNAME} ${DEVICE_PASSWORD}
-                    """
+                    script {
+                        def deviceIp = "${DEVICE_IP}"
+                        def deviceUsername = "${DEVICE_USERNAME}"
+                        def devicePassword = "${DEVICE_PASSWORD}"
+
+                        sh """
+                        python retrieve_config.py ${deviceIp} ${deviceUsername} ${devicePassword}
+                        """
+                    }
                 }
             }
         }
