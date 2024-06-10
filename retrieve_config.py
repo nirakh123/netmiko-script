@@ -1,17 +1,18 @@
+import sys
 import netmiko
 from netmiko import ConnectHandler, NetmikoTimeoutException, NetmikoAuthenticationException
-import getpass  
 
-IP = input("Enter IP: ")
-Username = input("Username: ")
-Password = getpass.getpass("Password: ")  
+# Read command-line arguments
+IP = sys.argv[1]
+Username = sys.argv[2]
+Password = sys.argv[3]
 
 device_info = {
-    'device_type': 'autodetect', 
+    'device_type': 'autodetect',
     'host': IP,
     'username': Username,
     'password': Password,
-    'port': 22 
+    'port': 22
 }
 
 try:
