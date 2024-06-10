@@ -1,30 +1,21 @@
 pipeline {
     agent {
         docker {
-            image 'python:3.8-slim' // Use a suitable Python Docker image
-            args '-u root' // Run as root user inside the container
+            image 'python:3.8-slim'
+            args '-u root'
         }
     }
-
     environment {
-        DEVICE_IP = '10.235.3.50' // Replace this with the actual IP of your Cisco device
+        CUSTOM_WORKSPACE = '/home/jenkins/workspace'
     }
-
     stages {
-        stage('Checkout Main') {
+        stage('Checkout SCM') {
             steps {
-                // Checkout the main branch to get the Jenkinsfile
-                checkout([$class: 'GitSCM', branches: [[name: 'refs/heads/main']], userRemoteConfigs: [[url: 'https://github.com/nirakh123/netmiko-script.git']]])
+                dir(env.CUSTOM_WORKSPACE) {
+                    git url: 'https://github.com/nirakh123/netmiko-script', credentialsId: 'CISCO_SWITCH_CREDENTIALS'
+                }
             }
         }
-        
-        stage('Checkout Master') {
-            steps {
-                // Checkout the master branch to get the Python script
-                checkout([$class: 'GitSCM', branches: [[name: 'refs/heads/master']], userRemoteConfigs: [[url: 'https://github.com/nirakh123/netmiko-script.git']]])
-            }
-        }
-
         stage('Setup Python Environment') {
             steps {
                 // Install dependencies
